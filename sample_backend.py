@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 app = Flask(__name__)
 
 @app.route('/')
@@ -33,26 +34,48 @@ users = {
          'id' : 'zap555', 
          'name': 'Dennis',
          'job': 'Bartender',
-      }
+      } 
    ]
 }
 
-@app.route('/users')
+@app.route('/users', methods=['GET', 'POST'])
 def get_users():
-   search_username = request.args.get('name') # accessing the value of parameter 'name'
-   if search_username:
-      subdict = {'users_list' : []}
-      for user in users['users_list']:
-         if user['name'] == search_username:
-            subdict['users_list'].append(user)
-      return subdict
-   return users
+   if request.method == 'GET':
+      search_username = request.args.get('name')
+      if search_username :
+         subdict = {'users_list' : []}
+         for user in users['users_list']:
+            if user['name'] == search_username:
+               subdict['users_list'].append(user)
+         return subdict
+      return users
+   elif request.method == 'POST':
+      userToAdd = request.get_json()
+      users['users_list'].append(userToAdd)
+      resp = jsonify(success=True)
+      #resp.status_code = 200 #optionally, you can always set a response code. 
+      # 200 is the default code for a normal response
+      return resp
 
-@app.route('/users/<id>')
+@app.route('/users/<id>', methods=['DELETE'])
 def get_user(id):
    if id :
+      if request.method == 'DELETE':
+         for user in users['users_list']:
+            if user['id'] == id:
+               users['users_list'].remove(user)
+      else:
+         for user in users['users_list']:
+            if user['id'] == id:
+               return user
+         return ({})
+   return users
+
+@app.route('/users/<name>/<job>')
+def get_exact_user(name, job):
+   if name and job:
       for user in users['users_list']:
-        if user['id'] == id:
+        if user['name'] == name and user['job'] == job:
            return user
       return ({})
    return users
