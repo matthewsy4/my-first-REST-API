@@ -79,4 +79,3 @@ def get_exact_user(name, job):
            return user
       return ({})
    return users
-
