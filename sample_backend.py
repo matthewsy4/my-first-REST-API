@@ -59,7 +59,7 @@ def get_users():
       resp = jsonify(success=True)
       resp.status_code = 201 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
-      return userToAdd
+      return userToAdd, 201
 
 @app.route('/users/<id>', methods=['DELETE', 'GET'])
 def get_user(id):
